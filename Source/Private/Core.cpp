@@ -2,7 +2,8 @@
 #include "Redirect.h"
 #include "Core.h"
 
-namespace Paradise {
+namespace Paradise 
+{
     void Core::Initialize() {
         const std::vector<uint8_t> PATTERN_1 = { 0x48, 0x81, 0xEC };
         const std::vector<uint8_t> PATTERN_2 = { 0x40 };

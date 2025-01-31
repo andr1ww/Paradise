@@ -4,7 +4,8 @@
 #include <string>
 #include <cstring>
 
-namespace Paradise::Unreal {
+namespace Paradise::Unreal 
+{
     class FMemory {
     public:
         static inline void* (*IRealloc)(void*, size_t, int64_t);

@@ -1,7 +1,8 @@
 #include "pch.h"
 #include "Unreal.h"
 
-namespace Paradise::Unreal {
+namespace Paradise::Unreal 
+{
     template<typename T>
     void TArray<T>::Free() {
         if (Data) {
