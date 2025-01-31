@@ -2,54 +2,51 @@
 #include "pch.h"
 #include <functional>
 #include <string>
-#include <cstring> 
+#include <cstring>
 
-namespace Paradise {
-	namespace Unreal {
-		class FMemory;
+namespace Paradise::Unreal {
+    class FMemory {
+    public:
+        static inline void* (*IRealloc)(void*, size_t, int64_t);
+        
+        static void* Malloc(size_t bytes);
+        static void Free(void* ptr);
+        static void* Realloc(void* ptr, size_t newSize);
+    };
 
-		template <typename T>
-		class TArray {
-			friend class FString;
+    template<typename ElementType>
+    class TArray {
+    protected:  
+        ElementType* Data;
+        int32_t NumElements;
+        int32_t MaxElements;
 
-			T* Data;
-			int32_t NumElements;
-			int32_t MaxElements;
+    public:
+        TArray() : Data(nullptr), NumElements(0), MaxElements(0) {}
+        auto GetData() { return Data; }
+        void Free();
+        int Num() const { return NumElements; }
+        auto& Get(const int idx) { return Data[idx]; }
+        bool Remove(const int idx, int elementSize = sizeof(ElementType));
+        
+        ElementType& operator[](int i) { return Get(i); }
+        const ElementType& operator[](int i) const { return Get(i); }
+    };
 
-		public:
-			TArray();
-			void Free();
-			auto GetData();
-			int Num() const;
-			auto& Get(const int Index);
-			T& operator[](int i);
-			const T& operator[](int i) const;
-			bool Remove(const int Index, int Size = sizeof(T));
-		};
+    class FString : public TArray<wchar_t> { 
+    public:
+        FString() : TArray<wchar_t>() {}
+        FString(const char* str);
+        FString(const wchar_t* str);
+        
+        wchar_t* ToString();
+    };
 
-		class FMemory {
-		public:
-			static inline void* (*IRealloc)(void*, size_t, int64_t);
+    class FCurlHttpRequest {
+    public:
+        void** VTable;
 
-			static void Free(void* Data);
-			static void* Malloc(size_t Size);
-			static void* Realloc(void* Data, size_t NewSize);
-		};
-
-		class FString : private TArray<wchar_t> {
-		public:
-			FString();
-			FString(const char* Other);
-			FString(const wchar_t* Other);
-			wchar_t* ToString();
-		};
-
-		class FCurlHttpRequest {
-		public:
-			void** VTable;
-
-			FString GetURL();
-			void SetURL(FString url);
-		};
-	}
+        FString GetURL();
+        void SetURL(const wchar_t* url); 
+    };
 }
