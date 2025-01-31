@@ -1,10 +1,7 @@
 #pragma once
 #include "pch.h"
 
-namespace Paradise
+namespace Paradise::Redirect
 {
-	namespace Redirect
-	{
-		bool ProcessRequest(FCurlHttpRequest* Request);
-	}
+	bool ProcessRequest(FCurlHttpRequest* Request);
 }
