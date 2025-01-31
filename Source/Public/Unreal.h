@@ -6,7 +6,6 @@
 
 namespace Paradise {
 	namespace Unreal {
-
 		class FMemory;
 
 		template <typename T>
