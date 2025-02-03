@@ -4,5 +4,4 @@
 namespace Paradise::Core 
 {
     void Initialize();
-    void Cleanup();
 }

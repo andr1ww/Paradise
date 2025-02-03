@@ -9,13 +9,10 @@ DWORD WINAPI Main(LPVOID)
         AllocConsole();
         FILE* fptr;
         freopen_s(&fptr, "CONOUT$", "w+", stdout);
+		SetWindowTextA(GetConsoleWindow(), "Paradise | https://github.com/itztiva/Paradise");
     }
 
-    Sleep(7000);
-
-    FMemory::IRealloc = Memcury::Scanner::FindStringRef(Paradise::Strings::Realloc)
-        .ScanFor({ Memcury::ASM::MNEMONIC::CALL })
-        .RelativeOffset(1)
+    FMemory::IRealloc = Memcury::Scanner::FindPattern(Paradise::Strings::Realloc)
         .GetAs<decltype(FMemory::IRealloc)>();
 
     Paradise::Core::Initialize();

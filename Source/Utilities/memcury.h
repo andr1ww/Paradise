@@ -745,7 +745,7 @@ namespace Memcury
                 }
             }
 
-            MemcuryAssertM(add != 0, "FindPattern return nullptr");
+      //      MemcuryAssertM(add != 0, "FindPattern return nullptr");
 
             return Scanner(add);
         }

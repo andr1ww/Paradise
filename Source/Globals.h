@@ -8,7 +8,7 @@ namespace Paradise {
     
     namespace Strings {
         constexpr auto ProcessRequest = L"Could not set libcurl options for easy handle, processing HTTP request failed. Increase verbosity for additional information.";
-        constexpr auto ProcessRequestStat = L"STAT_FCurlHttpRequest_ProcessRequest.";
-        constexpr auto Realloc = L"AbilitySystem.Debug.NextTarget";
+        constexpr auto ProcessRequestStat = L"STAT_FCurlHttpRequest_ProcessRequest";
+        constexpr auto Realloc = "48 89 5C 24 08 48 89 74 24 10 57 48 83 EC ? 48 8B F1 41 8B D8 48 8B 0D ? ? ? ?";
     }
 }
