@@ -35,7 +35,6 @@ namespace Paradise
         }
 
         if (auto targetPtr = ProcessRequestOG) {
-
             auto ref = Memcury::Scanner::FindPointerRef(targetPtr).GetAs<void**>();
             if (ref) {
                 DWORD oldProtect;
@@ -43,11 +42,13 @@ namespace Paradise
                     *ref = reinterpret_cast<void*>(Redirect::ProcessRequest);
                     VirtualProtect(ref, sizeof(void*), oldProtect, &oldProtect);
                     Log("Successfully hooked ProcessRequest");
+                    Paradise::Finder::InitializeExitHook();
                 }
             }
         }
         else {
             *Memcury::Scanner::FindPointerRef(targetPtr).GetAs<void**>() = Redirect::ProcessRequest;
+            Paradise::Finder::InitializeExitHook();
             Log("Error: Failed to find ProcessRequest");
         }
     }

@@ -15,7 +15,7 @@ DWORD WINAPI Main(LPVOID)
     if (Paradise::USE_BACKEND_PARAM) {
         const wchar_t* cmd = GetCommandLineW();
         const wchar_t* param = L"-backend=";
-        const wchar_t* found = wcsstr(cmd, param);
+        const wchar_t* found = wcsstr(cmd, param); 
 
         if (found != nullptr) {
             size_t urlLength = wcslen(found + wcslen(param));

@@ -3,4 +3,5 @@
 
 namespace Paradise::Finder {
 	uintptr_t FindPushWidget();
+	void InitializeExitHook();
 }
