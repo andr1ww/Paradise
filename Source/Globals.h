@@ -2,8 +2,8 @@
 #include "Unreal.h"
 
 namespace Paradise {
-    inline const wchar_t* BACKEND_URL = L"http://127.0.0.1:3551";
-    constexpr auto SHOW_CONSOLE = false;
+    inline const char* BACKEND_URL = "http://127.0.0.1:3551";
+    constexpr auto SHOW_CONSOLE = true;
     constexpr auto USE_BACKEND_PARAM = true;
 
     inline bool (*ProcessRequestOG)(Paradise::Unreal::FCurlHttpRequest*);

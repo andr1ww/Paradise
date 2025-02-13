@@ -24,6 +24,7 @@
 #include <future>
 #include <iomanip>  
 #include <set>
+#include "curl/curl.h"
 
 using namespace Paradise::Unreal;
 

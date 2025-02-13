@@ -405,14 +405,14 @@ namespace Memcury
             return reinterpret_cast<uintptr_t>(GetModuleHandleA(Globals::moduleName));
         }
 
-        inline auto GetDOSHeader() -> PIMAGE_DOS_HEADER
+        inline auto GetDOSHeader(uintptr_t moduleBase = PE::GetModuleBase()) -> PIMAGE_DOS_HEADER
         {
             return reinterpret_cast<PIMAGE_DOS_HEADER>(GetModuleBase());
         }
 
-        inline auto GetNTHeaders() -> PIMAGE_NT_HEADERS
+        inline auto GetNTHeaders(uintptr_t moduleBase = PE::GetModuleBase()) -> PIMAGE_NT_HEADERS
         {
-            return reinterpret_cast<PIMAGE_NT_HEADERS>(GetModuleBase() + GetDOSHeader()->e_lfanew);
+            return reinterpret_cast<PIMAGE_NT_HEADERS>(moduleBase + GetDOSHeader(moduleBase)->e_lfanew);
         }
 
         class Address
@@ -715,13 +715,13 @@ namespace Memcury
             return FindPatternEx(handle, pattern, mask, module, module + Memcury::PE::GetNTHeaders()->OptionalHeader.SizeOfImage);
         }
 
-        static auto FindPattern(const char* signature) -> Scanner
+        static auto FindPattern(const char* signature, uintptr_t moduleBase = PE::GetModuleBase()) -> Scanner
         {
             PE::Address add{ nullptr };
 
-            const auto sizeOfImage = PE::GetNTHeaders()->OptionalHeader.SizeOfImage;
+            const auto sizeOfImage = PE::GetNTHeaders(moduleBase)->OptionalHeader.SizeOfImage;
             auto patternBytes = ASM::pattern2bytes(signature);
-            const auto scanBytes = reinterpret_cast<std::uint8_t*>(PE::GetModuleBase());
+            const auto scanBytes = reinterpret_cast<std::uint8_t*>(moduleBase);
 
             const auto s = patternBytes.size();
             const auto d = patternBytes.data();
