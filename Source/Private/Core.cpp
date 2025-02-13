@@ -11,25 +11,16 @@ namespace Paradise
         const std::vector<uint8_t> PATTERN_2 = { 0x40 };
         const std::vector<uint8_t> PATTERN_3 = { 0x48, 0x8B, 0xC4 };
 
-        auto scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest);
+        auto scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat, Memcury::PE::GetModuleBase(), false);
 
-        if (scanner.IsValid()) {
-            if (!Paradise::Finder::FindPushWidget()) {
-                scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest);
-                ProcessRequestOG = scanner
-                    .ScanFor(PATTERN_1, false)
-                    .ScanFor(PATTERN_2, false)
-                    .GetAs<decltype(ProcessRequestOG)>();
-            }
-            else {
-                scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat);
-                ProcessRequestOG = scanner
-                    .ScanFor(PATTERN_3, false)
-                    .GetAs<decltype(ProcessRequestOG)>();
-            }
+        if (!scanner.IsValid()) {
+            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest);
+            ProcessRequestOG = scanner
+                //.ScanFor(PATTERN_1, false)
+                .ScanFor(PATTERN_2, false)
+                .GetAs<decltype(ProcessRequestOG)>();
         }
-        else {
-            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat);
+        else {  
             ProcessRequestOG = scanner
                 .ScanFor(PATTERN_3, false)
                 .GetAs<decltype(ProcessRequestOG)>();

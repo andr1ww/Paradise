@@ -751,7 +751,7 @@ namespace Memcury
 
         // Supports wide and normal strings both std and pointers
         template <typename T = const wchar_t*>
-        static auto FindStringRef(T string, uintptr_t moduleBase = PE::GetModuleBase()) -> Scanner
+        static auto FindStringRef(T string, uintptr_t moduleBase = PE::GetModuleBase(), bool bThrow = true) -> Scanner
         {
             PE::Address add{ nullptr };
 
@@ -817,7 +817,7 @@ namespace Memcury
                 }
             }
 
-            MemcuryAssertM(add != 0, "FindStringRef return nullptr");
+            if (bThrow) MemcuryAssertM(add != 0, "FindStringRef return nullptr");
 
             return Scanner(add);
         }
