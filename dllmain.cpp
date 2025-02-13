@@ -13,14 +13,14 @@ DWORD WINAPI Main(LPVOID)
     }
 
     if (Paradise::USE_BACKEND_PARAM) {
-        const char* cmd = GetCommandLineA();
-        const char* param = "-backend=";
-        const char* found = strstr(cmd, param); 
+        const wchar_t* cmd = GetCommandLineW();
+        const wchar_t* param = L"-backend=";
+        const wchar_t* found = wcsstr(cmd, param);
 
         if (found != nullptr) {
-            size_t urlLength = strlen(found + strlen(param));
-            char* newUrl = new char[urlLength + 1];
-            strcpy_s(newUrl, urlLength + 1, found + strlen(param));
+            size_t urlLength = wcslen(found + wcslen(param));
+            wchar_t* newUrl = new wchar_t[urlLength + 1];
+            wcscpy_s(newUrl, urlLength + 1, found + wcslen(param));
             Paradise::BACKEND_URL = newUrl;
         }
     }
