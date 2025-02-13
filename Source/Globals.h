@@ -4,7 +4,7 @@
 namespace Paradise {
     inline const char* BACKEND_URL = "http://127.0.0.1:3551";
     constexpr auto SHOW_CONSOLE = true;
-    constexpr auto USE_BACKEND_PARAM = true;
+    constexpr auto USE_BACKEND_PARAM = false;
 
     inline bool (*ProcessRequestOG)(Paradise::Unreal::FCurlHttpRequest*);
     inline void RequestExitWithStatus(bool Force, unsigned char Code) {}

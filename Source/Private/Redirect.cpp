@@ -15,6 +15,7 @@ inline CURLcode SetOpt(void* Data, CURLoption Tag, ...)
 }
 
 CURLcode Paradise::Redirect::CurlEasySetOpt(void* Data, CURLoption Tag, ...) {
+    if (!Data) return CURLE_BAD_FUNCTION_ARGUMENT;
     va_list arg;
     va_start(arg, Tag);
 
@@ -24,7 +25,7 @@ CURLcode Paradise::Redirect::CurlEasySetOpt(void* Data, CURLoption Tag, ...) {
         res = SetOpt(Data, Tag, 0);
     else if (Tag == CURLOPT_URL) {
         std::string url = va_arg(arg, char*);
-
+        Log(url);
         auto check = [](const std::string& fullUrl) -> std::pair<bool, size_t> {
             const auto domains = {
                 std::string("epicgames.dev"),
@@ -36,7 +37,7 @@ CURLcode Paradise::Redirect::CurlEasySetOpt(void* Data, CURLoption Tag, ...) {
                 }
             }
             return { false, 0 };
-            };
+        };
 
 
         if (auto [found, end] = check(url); found) {
@@ -46,12 +47,12 @@ CURLcode Paradise::Redirect::CurlEasySetOpt(void* Data, CURLoption Tag, ...) {
 
         res = SetOpt(Data, Tag, url.c_str());
     }
-    else
-        res = CurlSetOptInternal(Data, Tag, arg);
+    else res = CurlSetOptInternal(Data, Tag, arg);
 
     va_end(arg);
     return res;
 }
+
 bool Paradise::Redirect::ProcessRequest(FCurlHttpRequest* Request) 
 {
     auto check = [](const std::wstring& fullUrl) -> std::pair<bool, size_t> {
@@ -72,6 +73,7 @@ bool Paradise::Redirect::ProcessRequest(FCurlHttpRequest* Request)
         };
 
     std::wstring URL = Request->GetURL().ToString();
+    std::wcout << URL << std::endl;
     
     if (auto [found, end] = check(URL); found) {
         std::wstring newPath = URL.substr(end);
