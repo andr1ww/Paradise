@@ -1,5 +1,5 @@
 # Paradise
-A universal SSL bypass/redirect for Fortnite, Supported on 1.7.2 - 21.00!
+A universal SSL bypass/redirect for Fortnite, Supported on 1.7.2 - Latest!
 
 ### Setup
 Change `BACKEND_URL` in `Source/Globals.h` to your backend URL.
