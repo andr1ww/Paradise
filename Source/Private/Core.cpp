@@ -11,6 +11,7 @@ namespace Paradise
         const std::vector<uint8_t> PATTERN_2 = { 0x40 };
         const std::vector<uint8_t> PATTERN_3 = { 0x48, 0x8B, 0xC4 };
 		const std::vector<uint8_t> PATTERN_4 = { 0x4C, 0x8B, 0xDC };
+        const std::vector<uint8_t> PATTERN_5 = { 0x48, 0x83, 0xEC };
 
         auto scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat, Memcury::PE::GetModuleBase(), false);
 
@@ -33,16 +34,24 @@ namespace Paradise
             if (!ref) {
                 if (scanner.IsValid()) {
                     ProcessRequestOG = scanner
-                        .ScanFor(PATTERN_3, false)
+                        .ScanFor(PATTERN_5, false)
+						.ScanFor(PATTERN_2, false)
                         .GetAs<decltype(ProcessRequestOG)>();
                     ref = Memcury::Scanner::FindPointerRef(targetPtr).GetAs<void**>();
                     if (!ref) {
                         ProcessRequestOG = scanner
-                            .ScanFor(PATTERN_4, false)
+                            .ScanFor(PATTERN_3, false)
                             .GetAs<decltype(ProcessRequestOG)>();
+                        ref = Memcury::Scanner::FindPointerRef(targetPtr).GetAs<void**>();
+                        if (!ref) {
+                            ProcessRequestOG = scanner
+                                .ScanFor(PATTERN_4, false)
+                                .GetAs<decltype(ProcessRequestOG)>();
+                        }
                     }
                 }
             }
+
             if (ref) {
                 DWORD oldProtect;
                 if (VirtualProtect(ref, sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect)) {

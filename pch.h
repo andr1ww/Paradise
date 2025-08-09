@@ -24,6 +24,7 @@
 #include <future>
 #include <iomanip>  
 #include <set>
+#define IMAGEBASE *(uint64_t*)(__readgsqword(0x60) + 0x10);
 
 using namespace Paradise::Unreal;
 
