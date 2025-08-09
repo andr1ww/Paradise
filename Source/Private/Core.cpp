@@ -34,7 +34,6 @@ namespace Paradise
                     *ref = reinterpret_cast<void*>(Redirect::ProcessRequest);
                     VirtualProtect(ref, sizeof(void*), oldProtect, &oldProtect);
                     Log("Successfully hooked ProcessRequest");
-                    Paradise::Finder::InitializeExitHook();
                     if (Paradise::Finder::FindPushWidget()) {
                         auto EOSHandle = (uintptr_t)GetModuleHandleA("EOSSDK-Win64-Shipping.dll");
                         scanner = Memcury::Scanner::FindStringRef(L"ProcessRequest failed. URL '%s' is not using a whitelisted domain. %p", EOSHandle);

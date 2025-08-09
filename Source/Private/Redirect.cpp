@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Redirect.h"
+#include "Finder.h"
 
 void InternalProcessRequest(FCurlHttpRequest* Request)
 {
@@ -22,9 +23,15 @@ void InternalProcessRequest(FCurlHttpRequest* Request)
         };
 
     std::wstring URL = Request->GetURL().ToString();
-
+    static bool bInitExit = false;
     if (auto [found, end] = check(URL); found) {
         std::wstring newPath = URL.substr(end);
+        if (newPath.find(L"dedicated_server") != std::wstring::npos) {
+            if (!bInitExit) {
+                bInitExit = true;
+                Paradise::Finder::InitializeExitHook();
+            }
+        }
         std::wstring newUrl = Paradise::BACKEND_URL + newPath;
         Request->SetURL(newUrl.c_str());
     }
