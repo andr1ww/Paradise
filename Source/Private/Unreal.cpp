@@ -129,7 +129,7 @@ namespace Paradise::Unreal
             }
         }
 
-        if (SetUrlIndex != 10) {
+        if (SetUrlIndex != -1) {
             FString fstr(url);
             ((void (*)(FCurlHttpRequest*, FString&))VTable[SetUrlIndex])(this, fstr);
         }
