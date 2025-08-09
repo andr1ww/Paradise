@@ -4,6 +4,29 @@
 
 void InternalProcessRequest(FCurlHttpRequest* Request)
 {
+    static int RequestCount = 0;
+    RequestCount++;
+
+    if (RequestCount == 10) {
+        auto EOSHandle = (uintptr_t)GetModuleHandleA("EOSSDK-Win64-Shipping.dll");
+        if (EOSHandle) {
+            auto scanner = Memcury::Scanner::FindStringRef(L"ProcessRequest failed. URL '%s' is not using a whitelisted domain. %p", EOSHandle);
+            Paradise::EOSProcessRequestOG = scanner
+                .ScanFor({ 0x48, 0x89, 0x5c }, false)
+                .GetAs<decltype(Paradise::EOSProcessRequestOG)>();
+
+            auto ref = Memcury::Scanner::FindPointerRef(Paradise::EOSProcessRequestOG, EOSHandle).GetAs<void**>();
+            if (ref) {
+                DWORD oldProtect;
+                if (VirtualProtect(ref, sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect)) {
+                    *ref = reinterpret_cast<void*>(Paradise::Redirect::EOSProcessRequest);
+                    VirtualProtect(ref, sizeof(void*), oldProtect, &oldProtect);
+                    Log("Successfully hooked EOS ProcessRequest");
+                }
+            }
+        }
+    }
+
     auto check = [](const std::wstring& fullUrl) -> std::pair<bool, size_t> {
         const auto domains = {
             std::wstring(L"game-social.epicgames.com"),

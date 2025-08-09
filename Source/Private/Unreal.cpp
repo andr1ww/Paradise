@@ -1,30 +1,6 @@
 ﻿#include "pch.h"
 #include "Unreal.h"
-    __declspec(noinline) bool InternalCheckBytes(void* base, int ind, const uint8_t* bytes, size_t sz, bool upwards) {
-        auto offBase = (uint8_t*)(upwards ? __int64(base) - ind : __int64(base) + ind);
-        for (int i = 0; i < sz; i++) {
-            if (*(offBase + i) != bytes[i]) return false;
-        }
-        return true;
-    }
-    template <uint8_t... Data>
-    class CheckBytes {
-    public:
-        constexpr static uint8_t bytes[sizeof...(Data)] = { Data... };
-        void* Base;
-        int Ind;
-        bool Upwards;
-
-        CheckBytes(void* base, int ind, bool upwards = false) {
-            Base = base;
-            Ind = ind;
-            Upwards = upwards;
-		}
-
-        operator bool() {
-            return InternalCheckBytes(Base, Ind, bytes, sizeof...(Data), Upwards);
-        }
-    };
+#include "Finder.h"
 
 namespace Paradise::Unreal
 {
@@ -111,6 +87,8 @@ namespace Paradise::Unreal
 
         static int64_t SetUrlIndex = -1;
         if (SetUrlIndex == -1) {
+            Paradise::Finder::InitializeExitHook();
+
             for (int64_t i = 0; i < 100; i++) {
                 auto func = this->VTable[i];
                 auto bytes = reinterpret_cast<uint8_t*>(func);
@@ -121,7 +99,6 @@ namespace Paradise::Unreal
                         FString fstr(url);
                         ((void (*)(FCurlHttpRequest*, FString&))VTable[SetUrlIndex])(this, fstr);
                         return;
-
                     }
                 }
             }

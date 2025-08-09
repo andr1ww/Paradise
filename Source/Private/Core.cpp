@@ -58,23 +58,6 @@ namespace Paradise
                     *ref = reinterpret_cast<void*>(Redirect::ProcessRequest);
                     VirtualProtect(ref, sizeof(void*), oldProtect, &oldProtect);
                     Log("Successfully hooked ProcessRequest");
-                    if (Paradise::Finder::FindPushWidget()) {
-                        auto EOSHandle = (uintptr_t)GetModuleHandleA("EOSSDK-Win64-Shipping.dll");
-                        scanner = Memcury::Scanner::FindStringRef(L"ProcessRequest failed. URL '%s' is not using a whitelisted domain. %p", EOSHandle);
-                        EOSProcessRequestOG = scanner
-                            .ScanFor({ 0x48, 0x89, 0x5c }, false)
-                            .GetAs<decltype(EOSProcessRequestOG)>();
-
-                        auto ref = Memcury::Scanner::FindPointerRef(EOSProcessRequestOG, EOSHandle).GetAs<void**>();
-                        if (ref) {
-                            DWORD oldProtect;
-                            if (VirtualProtect(ref, sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect)) {
-                                *ref = reinterpret_cast<void*>(Redirect::EOSProcessRequest);
-                                VirtualProtect(ref, sizeof(void*), oldProtect, &oldProtect);
-                                Log("Successfully hooked EOS ProcessRequest");
-                            }
-                        }
-                    }
                 }
             }
         }
