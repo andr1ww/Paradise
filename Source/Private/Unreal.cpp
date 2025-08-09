@@ -68,7 +68,13 @@ namespace Paradise::Unreal
         return ((FString & (*)(FCurlHttpRequest*, FString))VTable[0])(this, FString());
     }
 
-    void FCurlHttpRequest::SetURL(const wchar_t* url) {
+    void FCurlHttpRequest::SetURL(const wchar_t* url, bool bEOS) {
+        if (bEOS) { // eos will always have a vtable of 10 i think?
+            FString fstr(url);
+            ((void (*)(FCurlHttpRequest*, FString&))VTable[10])(this, fstr);
+            return;
+        }
+
         void* GetFunc = *this->VTable;
         static uint32_t URLIndex = 0;
         for (int i = 0; i < 100; i++) {
@@ -85,9 +91,10 @@ namespace Paradise::Unreal
             return;
         }
 
+        // usually on high high builds seturl needs to be found as it isn't 10 anymore
         static int64_t SetUrlIndex = -1;
-        if (SetUrlIndex == -1) {
-            Paradise::Finder::InitializeExitHook();
+        if (SetUrlIndex == -1) { 
+            Paradise::Finder::InitializeExitHook(); // most high builds need this
 
             for (int64_t i = 0; i < 100; i++) {
                 auto func = this->VTable[i];

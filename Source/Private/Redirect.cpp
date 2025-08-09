@@ -2,7 +2,7 @@
 #include "Redirect.h"
 #include "Finder.h"
 
-void InternalProcessRequest(FCurlHttpRequest* Request)
+void InternalProcessRequest(FCurlHttpRequest* Request, bool bEOS)
 {
     static int RequestCount = 0;
     RequestCount++;
@@ -56,19 +56,24 @@ void InternalProcessRequest(FCurlHttpRequest* Request)
             }
         }
         std::wstring newUrl = Paradise::BACKEND_URL + newPath;
-        Request->SetURL(newUrl.c_str());
+        if (!bEOS) {
+            Request->SetURL(newUrl.c_str());
+        }
+        else {
+			Request->SetURL(newUrl.c_str(), true);
+        }
     }
 }
 
 bool Paradise::Redirect::ProcessRequest(FCurlHttpRequest* Request) 
 {
-    InternalProcessRequest(Request);
+    InternalProcessRequest(Request, false);
     return ProcessRequestOG(Request);
 }
 
 
 bool Paradise::Redirect::EOSProcessRequest(FCurlHttpRequest* Request)
 {
-    InternalProcessRequest(Request);
+    InternalProcessRequest(Request, true);
     return EOSProcessRequestOG(Request);
 }
