@@ -822,7 +822,7 @@ namespace Memcury
             return Scanner(add);
         }
 
-        static auto FindPointerRef(void* pointer, uintptr_t moduleBase = PE::GetModuleBase()) -> Scanner
+        static auto FindPointerRef(void* pointer, uintptr_t moduleBase = PE::GetModuleBase(), bool Alert = false) -> Scanner
         {
             PE::Address add{ nullptr };
 
@@ -840,7 +840,9 @@ namespace Memcury
                 }
             }
 
-            MemcuryAssertM(add != 0, "FindPointerRef return nullptr");
+            if (Alert) {
+                MemcuryAssertM(add != 0, "FindPointerRef return nullptr");
+            }
 
             return Scanner(add);
         }
