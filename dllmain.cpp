@@ -9,7 +9,7 @@ DWORD WINAPI Main(LPVOID)
         AllocConsole();
         FILE* fptr;
         freopen_s(&fptr, "CONOUT$", "w+", stdout);
-		SetWindowTextA(GetConsoleWindow(), "Paradise | https://github.com/itztiva/Paradise");
+		SetWindowTextA(GetConsoleWindow(), "Paradise | https://github.com/andr1ww/Paradise");
     }
 
     if (Paradise::USE_BACKEND_PARAM) {
