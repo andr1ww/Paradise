@@ -111,8 +111,6 @@ namespace Paradise::Unreal
 
         static int64_t SetUrlIndex = -1;
         if (SetUrlIndex == -1) {
-            int64_t processRequestIndex = -1;
-
             for (int64_t i = 0; i < 100; i++) {
                 auto func = this->VTable[i];
                 auto bytes = reinterpret_cast<uint8_t*>(func);
