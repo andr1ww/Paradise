@@ -22,9 +22,9 @@ namespace Paradise::Unreal
         return true;
     }
 
-    void* FMemory::Malloc(size_t bytes) {
-        return IRealloc(nullptr, bytes, 0);
-    }
+   void* FMemory::Malloc(size_t bytes) {
+       return malloc(bytes);
+   }
 
     void FMemory::Free(void* ptr) {
         IRealloc(ptr, 0, 0);
@@ -70,9 +70,10 @@ namespace Paradise::Unreal
 
     void FCurlHttpRequest::SetURL(const wchar_t* url, bool bEOS) {
         if (bEOS) { // eos will always have a vtable of 10 i think?
-            FString fstr(url);
-            ((void (*)(FCurlHttpRequest*, FString&))VTable[10])(this, fstr);
-            return;
+            FString str = url;
+            ((void (*)(FCurlHttpRequest*, FString&))VTable[10])(this, str);
+		    free(str.GetData());
+		    return;
         }
 
         void* GetFunc = *this->VTable;
@@ -86,8 +87,9 @@ namespace Paradise::Unreal
         }
 
         if (URLIndex == 0) {
-            FString fstr(url);
-            ((void (*)(FCurlHttpRequest*, FString&))VTable[10])(this, fstr);
+            FString str = url;
+            ((void (*)(FCurlHttpRequest*, FString&))VTable[10])(this, str);
+            free(str.GetData());
             return;
         }
 
@@ -112,8 +114,10 @@ namespace Paradise::Unreal
         }
 
         if (SetUrlIndex != -1) {
-            FString fstr(url);
-            ((void (*)(FCurlHttpRequest*, FString&))VTable[SetUrlIndex])(this, fstr);
+            FString str = url;
+            ((void (*)(FCurlHttpRequest*, FString&))VTable[SetUrlIndex])(this, str);
+			free(str.GetData());
+			return;
         }
     }
 }
