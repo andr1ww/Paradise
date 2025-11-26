@@ -2,80 +2,94 @@
 #include "Redirect.h"
 #include "Core.h"
 #include "Finder.h"
-#include <detours.h>
 
 namespace Paradise
 {
     void Core::Initialize()
     {
-        const std::vector<uint8_t> PATTERN_1 = {0x48, 0x81, 0xEC};
-        const std::vector<uint8_t> PATTERN_2 = {0x40};
-        const std::vector<uint8_t> PATTERN_3 = {0x48, 0x8B, 0xC4};
-        const std::vector<uint8_t> PATTERN_4 = {0x4C, 0x8B, 0xDC};
-        const std::vector<uint8_t> PATTERN_5 = {0x48, 0x83, 0xEC};
-
-        auto scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat, Memcury::PE::GetModuleBase(), false);
-
+        Memcury::Scanner scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat, Memcury::PE::GetModuleBase(), false);
+        
+        if (!scanner.IsValid())
+            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest);
+        
         if (!scanner.IsValid())
         {
-            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest);
-            ProcessRequestOG = scanner
-                                   .ScanFor(PATTERN_1, false)
-                                   .ScanFor(PATTERN_2, false)
-                                   .GetAs<decltype(ProcessRequestOG)>();
-        }
-        else
-        {
-            ProcessRequestOG = scanner
-                                   .ScanFor(PATTERN_1, false)
-                                   .ScanFor(PATTERN_2, false)
-                                   .GetAs<decltype(ProcessRequestOG)>();
+            Finder::InitializeExitHook();
+            return;
         }
 
-        if (auto targetPtr = ProcessRequestOG)
+        uint8_t* stream = scanner.GetAs<uint8_t*>();
+        void* FunctionPtr = nullptr;
+        
+        for (int i = 0; i < 2048; i++)
         {
-            auto ref = Memcury::Scanner::FindPtrRef(targetPtr).GetAs<void **>();
-            if (!ref)
+            uint8_t* current = stream - i;
+            
+            bool isPattern1 = current[0] == 0x4C && current[1] == 0x8B && current[2] == 0xDC;
+            bool isPattern2 = current[0] == 0x48 && current[1] == 0x8B && current[2] == 0xC4;
+            
+            if (isPattern1)
             {
-                if (scanner.IsValid())
+                FunctionPtr = current;
+                break;
+            }
+            else if (isPattern2)
+            {
+                FunctionPtr = current;
+                break;
+            }
+            else
+            {
+                bool isPattern3 = current[0] == 0x48 && current[1] == 0x81 && current[2] == 0xEC;
+                bool isPattern4 = current[0] == 0x48 && current[1] == 0x83 && current[2] == 0xEC;
+                
+                if (isPattern3 || isPattern4)
                 {
-                    ProcessRequestOG = scanner
-                                           .ScanFor(PATTERN_5, false)
-                                           .ScanFor(PATTERN_2, false)
-                                           .GetAs<decltype(ProcessRequestOG)>();
-                    ref = Memcury::Scanner::FindPtrRef(targetPtr).GetAs<void **>();
-                    if (!ref)
+                    for (int x = 0; x < 50; x++)
                     {
-                        ProcessRequestOG = scanner
-                                               .ScanFor(PATTERN_3, false)
-                                               .GetAs<decltype(ProcessRequestOG)>();
-                        ref = Memcury::Scanner::FindPtrRef(targetPtr).GetAs<void **>();
-                        if (!ref)
+                        uint8_t* inner = stream - i - x;
+                        
+                        if (inner[0] == 0x40)
                         {
-                            ProcessRequestOG = scanner
-                                                   .ScanFor(PATTERN_4, false)
-                                                   .GetAs<decltype(ProcessRequestOG)>();
+                            FunctionPtr = inner;
+                            goto _found;
+                        }
+                        else
+                        {
+                            bool innerPattern1 = inner[0] == 0x4C && inner[1] == 0x8B && inner[2] == 0xDC;
+                            bool innerPattern2 = inner[0] == 0x48 && inner[1] == 0x8B && inner[2] == 0xC4;
+                            bool innerPattern3 = inner[0] == 0x48 && inner[1] == 0x89 && inner[2] == 0x5C;
+                            
+                            if (innerPattern1 || innerPattern2 || innerPattern3)
+                                break;
                         }
                     }
                 }
             }
-
-            if (ref)
-            {
-                DWORD oldProtect;
-                if (VirtualProtect(ref, sizeof(void *), PAGE_EXECUTE_READWRITE, &oldProtect))
-                {
-                    *ref = reinterpret_cast<void *>(Redirect::ProcessRequest);
-                    VirtualProtect(ref, sizeof(void *), oldProtect, &oldProtect);
-                    Log("Successfully hooked ProcessRequest");
-                }
-            }
         }
-        else
+
+    _found:
+        if (!FunctionPtr)
         {
-            *Memcury::Scanner::FindPtrRef(targetPtr).GetAs<void **>() = Redirect::ProcessRequest;
-            Paradise::Finder::InitializeExitHook();
-            Log("Error: Failed to find ProcessRequest");
+            Finder::InitializeExitHook();
+            return;
+        }
+
+        ProcessRequestOG = reinterpret_cast<decltype(ProcessRequestOG)>(FunctionPtr);
+        void** ref = Memcury::Scanner::FindPtrRef(ProcessRequestOG).GetAs<void**>();
+        
+        if (!ref)
+        {
+            Finder::InitializeExitHook();
+            return;
+        }
+
+        DWORD oldProtect;
+        
+        if (VirtualProtect(ref, sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect))
+        {
+            *ref = reinterpret_cast<void*>(Redirect::ProcessRequest);
+            VirtualProtect(ref, sizeof(void*), oldProtect, &oldProtect);
         }
     }
 }
