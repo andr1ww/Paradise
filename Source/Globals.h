@@ -3,9 +3,9 @@
 
 namespace Paradise {
     inline const wchar_t* BACKEND_URL = L"http://127.0.0.1:3551";
-    constexpr auto SHOW_CONSOLE = false;
+    constexpr auto SHOW_CONSOLE = true;
     constexpr auto USE_BACKEND_PARAM = false;
-    constexpr auto SIG_PATCH = false;
+    constexpr auto SIG_PATCH = true;
 
     inline bool (*EOSProcessRequestOG)(Paradise::Unreal::FCurlHttpRequest*);
     inline bool (*ProcessRequestOG)(Paradise::Unreal::FCurlHttpRequest*);

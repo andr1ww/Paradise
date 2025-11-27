@@ -10,14 +10,22 @@ namespace Paradise
         Memcury::Scanner scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat, Memcury::PE::GetModuleBase(), false);
         
         if (!scanner.IsValid())
-            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest);
+            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest, Memcury::PE::GetModuleBase(), false);
         
         if (!scanner.IsValid())
         {
-            Finder::InitializeExitHook();
-            return;
+            Sleep(2500);
+            scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequestStat, Memcury::PE::GetModuleBase(), false);
+        
+            if (!scanner.IsValid())
+                scanner = Memcury::Scanner::FindStringRef(Strings::ProcessRequest, Memcury::PE::GetModuleBase(), false);
+            if (!scanner.IsValid())
+            {
+                Finder::InitializeExitHook();
+                return;
+            }
         }
-
+        
         uint8_t* stream = scanner.GetAs<uint8_t*>();
         void* FunctionPtr = nullptr;
         
@@ -83,7 +91,7 @@ namespace Paradise
             Finder::InitializeExitHook();
             return;
         }
-
+ 
         DWORD oldProtect;
         
         if (VirtualProtect(ref, sizeof(void*), PAGE_EXECUTE_READWRITE, &oldProtect))

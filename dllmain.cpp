@@ -54,6 +54,7 @@ DWORD WINAPI Main(LPVOID)
     FMemory::IRealloc = Memcury::Scanner::FindPattern(Paradise::Strings::Realloc)
         .GetAs<decltype(FMemory::IRealloc)>();
 
+    Sleep(2500);
     Paradise::Core::Initialize();
 
     return 0;

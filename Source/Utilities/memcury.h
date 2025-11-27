@@ -815,10 +815,6 @@ namespace Memcury
 					}
 				}
 			}
-
-			if (bThrow)
-				MemcuryAssertM(add != 0, "FindStringRef return nullptr");
-
 			return Scanner(add);
 		}
 
